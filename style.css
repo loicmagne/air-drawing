@@ -5,6 +5,23 @@ body {
     margin-top: 5%;
 }
 
+#video {
+    display: flex;
+    justify-content: center;
+}
+
+canvas {
+    flex: none;
+    border: solid 1px;
+    width: 800px;
+    height: 600px;
+}
+
+video {
+    width: 0px;
+    height: 0px;
+}
+
 h1 {
     margin-bottom: 10%;
 }
