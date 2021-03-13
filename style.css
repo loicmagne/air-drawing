@@ -1,3 +1,10 @@
 body {
-  font-family: monospace;
+    font-family: monospace;
+    margin-left: 30%;
+    margin-right: 30%;
+    margin-top: 10%;
+}
+
+element {
+    margin-bottom: 10%;
 }
