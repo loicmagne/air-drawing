@@ -33,6 +33,8 @@ function initVideo() {
   
 function drawCanvas(video, canvas, context, frameRate) {
   context.drawImage(video, 0, 0, canvas.width, canvas.height);
+  currentImage = context.getImageData(0,0,canvas.width,canvas.height);
+  processImage(currentImage,context);
   // End of loop
   setTimeout(drawCanvas, 1/frameRate, video, canvas, context, frameRate);
 }
