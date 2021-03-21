@@ -5,8 +5,9 @@ function detectSkin(r,g,b) {
   return ((77 <= Cb) && (Cb <= 127) && (133 <= Cr) && (Cr <= 173))?255:0
 }
 
-function processImage(image, context) {
+function processImage(image, context,yolo) {
   data = image.data;
+  /* Skin filter
   for (let i = 0; i<data.length; i+=4) {
     r = data[i];
     g = data[i+1];
@@ -15,4 +16,5 @@ function processImage(image, context) {
   }
   image.data = data;
   context.putImageData(image, 0, 0);
+  */
 }

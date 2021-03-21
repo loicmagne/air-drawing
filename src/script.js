@@ -26,15 +26,18 @@ function initVideo() {
 
   video.addEventListener('play', function() {
     let context = canvas.getContext('2d');
-
-    drawCanvas(video, canvas, context, FRAMERATE);
+    const onnxYolo = new onnx.InferenceSession();
+    // load the ONNX model file
+    onnxYolo.loadModel("../yolov5/best.onnx").then(() => {
+      drawCanvas(video, canvas, context, FRAMERATE, onnxYolo);
+    })
   }, false);
 }
   
-function drawCanvas(video, canvas, context, frameRate) {
+function drawCanvas(video, canvas, context, frameRate, yolo) {
   context.drawImage(video, 0, 0, canvas.width, canvas.height);
   currentImage = context.getImageData(0,0,canvas.width,canvas.height);
-  processImage(currentImage,context);
+  processImage(currentImage,context,yolo);
   // End of loop
   setTimeout(drawCanvas, 1/frameRate, video, canvas, context, frameRate);
 }
