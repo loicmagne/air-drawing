@@ -23,5 +23,9 @@ video {
 }
 
 h1 {
-    margin-bottom: 10%;
+    margin: 5%;
+}
+
+#displayRadio {
+    margin: 5%;
 }

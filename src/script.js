@@ -24,22 +24,21 @@ function initVideo() {
     console.log(err.name+": "+err.message);
   });
 
-  video.addEventListener('play', function() {
+  video.addEventListener('play', async () => {
     let context = canvas.getContext('2d');
-    const onnxYolo = new onnx.InferenceSession();
-    // load the ONNX model file
-    onnxYolo.loadModel("../yolov5/best.onnx").then(() => {
-      drawCanvas(video, canvas, context, FRAMERATE, onnxYolo);
-    })
+    const model = await handpose.load(); 
+       
+    drawCanvas(video, canvas, context, FRAMERATE, model);
   }, false);
 }
   
-function drawCanvas(video, canvas, context, frameRate, yolo) {
+function drawCanvas(video, canvas, context, frameRate, model) {
   context.drawImage(video, 0, 0, canvas.width, canvas.height);
   currentImage = context.getImageData(0,0,canvas.width,canvas.height);
-  processImage(currentImage,context,yolo);
+  processImage(video,currentImage,context,model);
+  
   // End of loop
-  setTimeout(drawCanvas, 1/frameRate, video, canvas, context, frameRate);
+  window.requestAnimationFrame(() => drawCanvas(video,canvas,context,frameRate,model));
 }
 
 window.onload = initVideo
