@@ -95,20 +95,10 @@ function drawBoundingBox(predictions, ctx) {
       
       const w = bottomX-x;
       const h = bottomY-y;
+      ctx.beginPath();
       ctx.rect(x, y, w, h);
-      ctx.fill();
-      
-      
-      ctx.beginPath();
-      ctx.arc(x, y, 6, 0, 3 * Math.PI);
-
-      ctx.fillStyle = "gold";
-      ctx.fill();
-      ctx.beginPath();
-      ctx.arc(bottomX, bottomY, 6, 0, 3 * Math.PI);
-
-      ctx.fillStyle = "gold";
-      ctx.fill();
+      ctx.strokeStyle = "plum";
+      ctx.stroke();
     });
   }
 }
