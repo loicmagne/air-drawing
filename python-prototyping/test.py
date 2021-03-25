@@ -35,7 +35,7 @@ while True:
   new_pts,status,err = cv2.calcOpticalFlowPyrLK(old_gray, 
                                                 new_gray, 
                                                 old_pts, 
-                                                None, maxLevel=0,
+                                                None, maxLevel=1,
                                                 criteria=(cv2.TERM_CRITERIA_EPS | cv2.TERM_CRITERIA_COUNT, 15, 0.08))
 
   cv2.circle(mask, (new_pts.ravel()[0] ,new_pts.ravel()[1]), 2, (0,255,0), 2)

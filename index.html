@@ -11,6 +11,8 @@
     <script src="https://unpkg.com/@tensorflow/tfjs-backend-webgl@2.1.0/dist/tf-backend-webgl.js"></script>
     <script src="https://unpkg.com/@tensorflow-models/handpose@0.0.6/dist/handpose.js"></script>
     
+    <script src="src/opencv.js"></script>
+    
     <script src="src/script.js"></script>
     <script src="src/process.js"></script>
   </head>
@@ -18,7 +20,7 @@
     <h1>air-drawing</h1>
     <div id="video" >
       <video autoplay></video>
-      <canvas></canvas>
+      <canvas id="canvas"></canvas>
     </div>
     <div id="displayRadio">
       <input type="radio" name="display" value="1" checked="checked">
