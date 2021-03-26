@@ -54,15 +54,15 @@ function init() {
     
     const model = await handpose.load(); 
     
-    drawCanvas(video, canvas, context, model, mats, cap, flow_param);
+    drawCanvas(video, canvas, context, model, mats, cap, flow_param, 0);
   }, false);
 }
   
-function drawCanvas(video, canvas, context, model, mats, cap, flow) {
+function drawCanvas(video, canvas, context, model, mats, cap, flow, frame) {
   cap.read(mats.new_rgb);
   cv.cvtColor(mats.new_rgb, mats.new_gray, cv.COLOR_RGB2GRAY, 0);
   
-  processImage(video,context,model,mats,flow);
+  processImage(video,context,model,mats,flow,frame);
   
   /* KEYPOINTS
   let gray_mat = new cv.Mat();
@@ -78,7 +78,7 @@ function drawCanvas(video, canvas, context, model, mats, cap, flow) {
   */
   // End of loop
   mats.old_gray = mats.new_gray.clone();
-  window.requestAnimationFrame(() => drawCanvas(video,canvas,context, model, mats, cap, flow));
+  window.requestAnimationFrame(() => drawCanvas(video,canvas,context, model, mats, cap, flow, (frame+1)%FRAMERATE));
 }
 
 window.onload = init
