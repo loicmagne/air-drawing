@@ -44,13 +44,23 @@ function init() {
     let mats = {
       old_gray: new cv.Mat(),
       new_gray: new cv.Mat(),
-      new_rgb: new cv.Mat(HEIGHT, WIDTH, cv.CV_8UC4)
+
+      old_masked_gray: new cv.Mat(),
+      new_masked_gray: new cv.Mat(),
+
+      new_rgb: new cv.Mat(HEIGHT, WIDTH, cv.CV_8UC4),
+      new_ycrcb: new cv.Mat(),
+      new_hsv: new cv.Mat(),
+
+      mask: new cv.Mat(),
+      akaze: new cv.AKAZE()
     }
     let cap = new cv.VideoCapture(video);
     
     // Initiate the old gray Mat
     cap.read(mats.new_rgb);
-    cv.cvtColor(mats.new_rgb, mats.old_gray, cv.COLOR_RGB2GRAY, 0);
+    cv.cvtColor(mats.new_rgb, mats.old_gray, cv.COLOR_RGBA2GRAY, 0);
+    cv.cvtColor(mats.new_rgb, mats.old_masked_gray, cv.COLOR_RGBA2GRAY, 0);
     
     const model = await handpose.load(); 
     
@@ -60,9 +70,12 @@ function init() {
   
 function drawCanvas(video, canvas, context, model, mats, cap, flow, frame) {
   cap.read(mats.new_rgb);
-  cv.cvtColor(mats.new_rgb, mats.new_gray, cv.COLOR_RGB2GRAY, 0);
-  
+  cv.cvtColor(mats.new_rgb, mats.new_gray, cv.COLOR_RGBA2GRAY, 0);
+  cv.cvtColor(mats.new_rgb, mats.new_ycrcb, cv.COLOR_RGB2YCrCb, 0);
+  cv.cvtColor(mats.new_rgb, mats.new_hsv, cv.COLOR_RGB2HSV, 0);
+
   processImage(video,context,model,mats,flow,frame);
+  drawImage(context, mats, flow);
   
   /* KEYPOINTS
   let gray_mat = new cv.Mat();
@@ -78,6 +91,7 @@ function drawCanvas(video, canvas, context, model, mats, cap, flow, frame) {
   */
   // End of loop
   mats.old_gray = mats.new_gray.clone();
+  mats.old_masked_gray = mats.new_masked_gray.clone();
   window.requestAnimationFrame(() => drawCanvas(video,canvas,context, model, mats, cap, flow, (frame+1)%FRAMERATE));
 }
 

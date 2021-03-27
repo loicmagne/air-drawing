@@ -92,3 +92,19 @@ function drawBoundingBox(predictions, ctx) {
     });
   }
 }
+
+async function drawImage(context, mats, flow) {
+  cv.imshow('canvas', mats.new_rgb);
+  
+  // Draw Circle
+  context.beginPath();
+  context.arc(flow.new_pts.data32F[0], flow.new_pts.data32F[1],
+              5, 0, 3 * Math.PI);
+  context.fillStyle = "gold";
+  context.fill();
+  context.beginPath();
+  context.arc(flow.new_pts.data32F[0], flow.new_pts.data32F[1],
+              3, 0, 3 * Math.PI);
+  context.fillStyle = "blue";
+  context.fill();
+}

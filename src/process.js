@@ -17,14 +17,40 @@ const HANDPOSE_HEIGHT = 480;
 
 */
 
-function detectSkin(r,g,b) {
-  Y =  0.2990*r + 0.5870*g + 0.1140*b;
-  Cb = -0.1687*r - 0.3313*g + 0.5000*b + 128;
-  Cr =  0.5000*r - 0.4187*g - 0.0813*b + 128;
-  return ((77 <= Cb) && (Cb <= 127) && (133 <= Cr) && (Cr <= 173))?255:0
+function detectSkinYCrCb(mats) {
+  const tresh_val = 100;
+  // Get YCrCb channels
+  let ycrcb = new cv.MatVector();
+  cv.split(mats.new_ycrcb, ycrcb);
+
+  // Apply threshold to Cr and Cb
+  cv.threshold(ycrcb.get(1), ycrcb.get(1), 133, tresh_val, cv.THRESH_BINARY);
+  cv.threshold(ycrcb.get(1), ycrcb.get(1), 173, tresh_val, cv.THRESH_TOZERO_INV);
+  cv.threshold(ycrcb.get(2), ycrcb.get(2), 77, tresh_val, cv.THRESH_BINARY);
+  cv.threshold(ycrcb.get(2), ycrcb.get(2), 127, tresh_val, cv.THRESH_TOZERO_INV);
+
+  // Merge thresholded channels into a mask
+  cv.bitwise_and(ycrcb.get(1),ycrcb.get(2),mats.mask)
+
+  // Delete allocated MatVector
+  ycrcb.delete();
+
+  // Convert the mask to RGB and merge the mask with original RGB image
+  cv.threshold(mats.mask, mats.mask, 10, 255, cv.THRESH_BINARY);
+  cv.bitwise_and(mats.new_gray,mats.mask,mats.new_masked_gray)
 }
 
-async function detectFingerTip(video, flow, model, context) {
+function detectSkinHSV(mats) {
+  let hsv = new cv.MatVector();
+  cv.split(mats.new_hsv, hsv);
+  cv.threshold(hsv.get(0), hsv.get(0), 17, 127, cv.THRESH_BINARY_INV);
+  cv.threshold(hsv.get(1), hsv.get(1), 15, 127, cv.THRESH_BINARY);
+  cv.threshold(hsv.get(1), hsv.get(1), 170, 127, cv.THRESH_TOZERO_INV);
+  cv.bitwise_and(hsv.get(0),hsv.get(1),mats.mask)
+  hsv.delete();
+}
+
+async function detectFingerTip(video, flow, model, mats, context) {
   const predictions = await model.estimateHands(video);
   
   if (predictions.length > 0) {
@@ -41,50 +67,21 @@ async function detectFingerTip(video, flow, model, context) {
   displayStyles[displayStyle](predictions, context);
 }
 
-// Skin Filter with openjs
-// Mask for keypoints
-// Technique to recompute keypoints every seconds
-// Optical flow
-
 async function processImage(video, context, model, mats, flow, frame) {
-  if (!(frame%FRAMERATE)) {
-    detectFingerTip(video, flow, model, context);
+  // Detect hand
+  if (!(frame%(FRAMERATE))) {
+    detectFingerTip(video, flow, model, mats, context);
   }
-  cv.imshow('canvas', mats.new_rgb);
-  cv.calcOpticalFlowPyrLK(mats.old_gray, mats.new_gray,
+
+  // Detect skin
+  detectSkinYCrCb(mats);
+
+  // Apply optical flow
+  cv.calcOpticalFlowPyrLK(mats.old_masked_gray, mats.new_masked_gray,
                           flow.old_pts, flow.new_pts, flow.st,
                           flow.err, flow.winSize, flow.maxLevel,
                           flow.criteria);
-                          
-  // Draw Circle
-  
-  context.beginPath();
-  context.arc(flow.new_pts.data32F[0], flow.new_pts.data32F[1],
-              5, 0, 3 * Math.PI);
-  context.fillStyle = "gold";
-  context.fill();
-  context.beginPath();
-  context.arc(flow.new_pts.data32F[0], flow.new_pts.data32F[1],
-              3, 0, 3 * Math.PI);
-  context.fillStyle = "blue";
-  context.fill();
-  
-  flow.old_pts = flow.new_pts.clone();        
-  /* Draw Hands
-  const predictions = await model.estimateHands(video);
-  displayStyles = [drawFullHand,drawBoundingBox,drawFingerTips,drawIndex]
-  displayStyle = document.querySelector('input[name="display"]:checked').value-1;
-  displayStyles[displayStyle](predictions, context);
-  */
-  
-  /* Skin filter
-  for (let i = 0; i<data.length; i+=4) {
-    r = data[i];
-    g = data[i+1];
-    b = data[i+2];
-    data[i] = data[i+1] = data[i+2] = detectSkin(r,g,b);
-  }
-  image.data = data;
-  context.putImageData(image, 0, 0);
-  */
+
+  // Update points
+  flow.old_pts = flow.new_pts.clone();
 }
