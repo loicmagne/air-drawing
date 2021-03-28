@@ -30,24 +30,13 @@ function detectSkinYCrCb(mats) {
   cv.threshold(ycrcb.get(2), ycrcb.get(2), 127, tresh_val, cv.THRESH_TOZERO_INV);
 
   // Merge thresholded channels into a mask
-  cv.bitwise_and(ycrcb.get(1),ycrcb.get(2),mats.mask)
+  cv.bitwise_and(ycrcb.get(1),ycrcb.get(2),mats.mask_skin)
 
   // Delete allocated MatVector
   ycrcb.delete();
 
-  // Convert the mask to RGB and merge the mask with original RGB image
-  cv.threshold(mats.mask, mats.mask, 10, 255, cv.THRESH_BINARY);
-  cv.bitwise_and(mats.new_gray,mats.mask,mats.new_masked_gray)
-}
-
-function detectSkinHSV(mats) {
-  let hsv = new cv.MatVector();
-  cv.split(mats.new_hsv, hsv);
-  cv.threshold(hsv.get(0), hsv.get(0), 17, 127, cv.THRESH_BINARY_INV);
-  cv.threshold(hsv.get(1), hsv.get(1), 15, 127, cv.THRESH_BINARY);
-  cv.threshold(hsv.get(1), hsv.get(1), 170, 127, cv.THRESH_TOZERO_INV);
-  cv.bitwise_and(hsv.get(0),hsv.get(1),mats.mask)
-  hsv.delete();
+  // Change scale of the mask to make it a 0-1 mask
+  cv.threshold(mats.mask_skin, mats.mask_skin, 10, 255, cv.THRESH_BINARY);
 }
 
 async function detectFingerTip(video, flow, model, mats, context) {
@@ -67,14 +56,21 @@ async function detectFingerTip(video, flow, model, mats, context) {
   displayStyles[displayStyle](predictions, context);
 }
 
-async function processImage(video, context, model, mats, flow, frame) {
+async function processImage(video, context, model, mats, flow, misc, frame) {
+  // Hand presegmentation
+  detectSkinYCrCb(mats); // Skin color Mask
+  misc.gmm_bs.apply(mats.new_rgb, mats.mask_bs); // Background/Foreground Mask
+  cv.bitwise_and(mats.mask_skin,mats.mask_bs,mats.mask); // Merge them
+  // Mask filtering
+  cv.morphologyEx(mats.mask, mats.mask, cv.MORPH_CLOSE, misc.kernel);
+  cv.dilate(mats.mask, mats.mask, misc.kernel);
+
+  cv.bitwise_and(mats.new_gray,mats.mask,mats.new_masked_gray); // Get the new masked image
+
   // Detect hand
   if (!(frame%(FRAMERATE))) {
     detectFingerTip(video, flow, model, mats, context);
   }
-
-  // Detect skin
-  detectSkinYCrCb(mats);
 
   // Apply optical flow
   cv.calcOpticalFlowPyrLK(mats.old_masked_gray, mats.new_masked_gray,

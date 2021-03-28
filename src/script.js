@@ -40,6 +40,12 @@ function init() {
       criteria: new cv.TermCriteria(cv.TERM_CRITERIA_EPS | cv.TERM_CRITERIA_COUNT, 10, 0.03)
     }
     
+    // Tools needed
+    let misc = {
+      gmm_bs: new cv.BackgroundSubtractorMOG2(500, 32, false),
+      kernel: cv.Mat.ones(5, 5, cv.CV_8U) // Kernel for Dilation/Erosion
+    }
+
     // Initialize all Mat needed
     let mats = {
       old_gray: new cv.Mat(),
@@ -50,10 +56,10 @@ function init() {
 
       new_rgb: new cv.Mat(HEIGHT, WIDTH, cv.CV_8UC4),
       new_ycrcb: new cv.Mat(),
-      new_hsv: new cv.Mat(),
 
-      mask: new cv.Mat(),
-      akaze: new cv.AKAZE()
+      mask_skin: new cv.Mat(), // Mask for skin segmentation
+      mask_bs: new cv.Mat(), // Mask for background subtraction
+      mask: new cv.Mat() // Overall Mask
     }
     let cap = new cv.VideoCapture(video);
     
@@ -64,17 +70,16 @@ function init() {
     
     const model = await handpose.load(); 
     
-    drawCanvas(video, canvas, context, model, mats, cap, flow_param, 0);
+    drawCanvas(video, canvas, context, cap, model, mats, flow_param, misc, 0);
   }, false);
 }
   
-function drawCanvas(video, canvas, context, model, mats, cap, flow, frame) {
+function drawCanvas(video, canvas, context, cap, model, mats, flow, misc, frame) {
   cap.read(mats.new_rgb);
   cv.cvtColor(mats.new_rgb, mats.new_gray, cv.COLOR_RGBA2GRAY, 0);
   cv.cvtColor(mats.new_rgb, mats.new_ycrcb, cv.COLOR_RGB2YCrCb, 0);
-  cv.cvtColor(mats.new_rgb, mats.new_hsv, cv.COLOR_RGB2HSV, 0);
 
-  processImage(video,context,model,mats,flow,frame);
+  processImage(video, context, model, mats, flow, misc, frame);
   drawImage(context, mats, flow);
   
   /* KEYPOINTS
@@ -90,9 +95,12 @@ function drawCanvas(video, canvas, context, model, mats, cap, flow, frame) {
   cv.drawKeypoints(mat,kp,dest)
   */
   // End of loop
-  mats.old_gray = mats.new_gray.clone();
-  mats.old_masked_gray = mats.new_masked_gray.clone();
-  window.requestAnimationFrame(() => drawCanvas(video,canvas,context, model, mats, cap, flow, (frame+1)%FRAMERATE));
+  mats.new_gray.copyTo(mats.old_gray);
+  mats.new_masked_gray.copyTo(mats.old_masked_gray);
+
+  // mats.old_gray = mats.new_gray.clone();
+  // mats.old_masked_gray = mats.new_masked_gray.clone();
+  window.requestAnimationFrame(() => drawCanvas(video, canvas, context, cap, model, mats, flow, misc, (frame+1)%FRAMERATE));
 }
 
 window.onload = init
