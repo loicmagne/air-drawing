@@ -31,7 +31,7 @@ function init() {
     
     // Initialize Optical Flow parameters
     let flow_param = {
-      old_pts: cv.matFromArray(2, 1, cv.CV_32FC2, [100,100]),
+      old_pts: new cv.Mat(),
       new_pts: new cv.Mat(),
       st: new cv.Mat(),
       err: new cv.Mat(),
@@ -42,7 +42,6 @@ function init() {
     
     // Tools needed
     let misc = {
-      gmm_bs: new cv.BackgroundSubtractorMOG2(500, 32, false),
       kernel: cv.Mat.ones(5, 5, cv.CV_8U) // Kernel for Dilation/Erosion
     }
 
@@ -57,9 +56,7 @@ function init() {
       new_rgb: new cv.Mat(HEIGHT, WIDTH, cv.CV_8UC4),
       new_ycrcb: new cv.Mat(),
 
-      mask_skin: new cv.Mat(), // Mask for skin segmentation
-      mask_bs: new cv.Mat(), // Mask for background subtraction
-      mask: new cv.Mat() // Overall Mask
+      mask_skin: new cv.Mat() // Mask for skin segmentation
     }
     let cap = new cv.VideoCapture(video);
     
@@ -74,24 +71,18 @@ function init() {
   }, false);
 }
   
-function drawCanvas(video, canvas, context, cap, model, mats, flow, misc, frame) {
+function drawCanvas(video, canvas, context, cap, model, mats, flow, misc) {
   cap.read(mats.new_rgb);
   cv.cvtColor(mats.new_rgb, mats.new_gray, cv.COLOR_RGBA2GRAY, 0);
   cv.cvtColor(mats.new_rgb, mats.new_ycrcb, cv.COLOR_RGB2YCrCb, 0);
 
-  processImage(video, context, model, mats, flow, misc, frame);
+  processImage(video, context, model, mats, flow, misc);
   drawImage(context, mats, flow);
   
   /* KEYPOINTS
-  let gray_mat = new cv.Mat();
-  cv.cvtColor(mat, gray_mat, cv.COLOR_RGB2GRAY, 0);
-  let dest = new cv.Mat();
-  let keypoints = new cv.KeyPointVector(); // out param
   let orb = new cv.AKAZE();
   let kp = new cv.KeyPointVector();
-  // find the keypoints with ORB
   orb.detect(gray_mat, kp);
-  
   cv.drawKeypoints(mat,kp,dest)
   */
   // End of loop
@@ -100,7 +91,7 @@ function drawCanvas(video, canvas, context, cap, model, mats, flow, misc, frame)
 
   // mats.old_gray = mats.new_gray.clone();
   // mats.old_masked_gray = mats.new_masked_gray.clone();
-  window.requestAnimationFrame(() => drawCanvas(video, canvas, context, cap, model, mats, flow, misc, (frame+1)%FRAMERATE));
+  window.requestAnimationFrame(() => drawCanvas(video, canvas, context, cap, model, mats, flow, misc));
 }
 
 window.onload = init

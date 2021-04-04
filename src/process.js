@@ -39,38 +39,53 @@ function detectSkinYCrCb(mats) {
   cv.threshold(mats.mask_skin, mats.mask_skin, 10, 255, cv.THRESH_BINARY);
 }
 
-async function detectFingerTip(video, flow, model, mats, context) {
-  const predictions = await model.estimateHands(video);
-  
-  if (predictions.length > 0) {
-    predictions.forEach((prediction) => {
-      const finger = fingerJoints.indexFinger[4];
-      const landmarks = prediction.landmarks;
-      const coord = changeScale(landmarks[finger][0],landmarks[finger][1]);
-      flow.old_pts = cv.matFromArray(2, 1, cv.CV_32FC2, coord);
-    });
+function FingerTip(){
+  // Function closure to count the frames
+  let count = 0;
+  const max_count = FRAMERATE*60;
+  const refresh_not_found = FRAMERATE;
+  const refresh_found = FRAMERATE*5;
+
+  async function detectFingerTip(video, flow, model, mats, context) {
+    if (
+      (!(count%refresh_not_found) && flow.old_pts.empty()) || 
+      (!(count%refresh_found) && !flow.old_pts.empty())
+    ){
+      const predictions = await model.estimateHands(video);
+      if (predictions.length > 0) {
+        predictions.forEach((prediction) => {
+          const finger = fingerJoints.indexFinger[4];
+          const landmarks = prediction.landmarks;
+          const coord = changeScale(landmarks[finger][0],landmarks[finger][1]);
+          flow.old_pts = cv.matFromArray(2, 1, cv.CV_32FC2, coord);
+        });
+      }
+      
+      // Handle display
+      displayStyles = [drawFullHand,drawBoundingBox,drawFingerTips,drawIndex]
+      displayStyle = document.querySelector('input[name="display"]:checked').value-1;
+      displayStyles[displayStyle](predictions, context);
+    }
+    count = (count+1)%max_count;
   }
-  
-  displayStyles = [drawFullHand,drawBoundingBox,drawFingerTips,drawIndex]
-  displayStyle = document.querySelector('input[name="display"]:checked').value-1;
-  displayStyles[displayStyle](predictions, context);
+  return detectFingerTip;
 }
+// Get the closure
+const detectFingerTip = FingerTip();
 
 async function processImage(video, context, model, mats, flow, misc, frame) {
-  // Hand presegmentation
-  detectSkinYCrCb(mats); // Skin color Mask
-  misc.gmm_bs.apply(mats.new_rgb, mats.mask_bs); // Background/Foreground Mask
-  cv.bitwise_and(mats.mask_skin,mats.mask_bs,mats.mask); // Merge them
-  // Mask filtering
-  cv.morphologyEx(mats.mask, mats.mask, cv.MORPH_CLOSE, misc.kernel);
-  cv.dilate(mats.mask, mats.mask, misc.kernel);
+  // Skin color Mask
+  detectSkinYCrCb(mats);
 
-  cv.bitwise_and(mats.new_gray,mats.mask,mats.new_masked_gray); // Get the new masked image
+  // Mask filtering
+  cv.morphologyEx(mats.mask_skin, mats.mask_skin, cv.MORPH_OPEN, misc.kernel);
+  cv.morphologyEx(mats.mask_skin, mats.mask_skin, cv.MORPH_CLOSE, misc.kernel);
+
+  // New gray image
+  cv.bitwise_and(mats.new_gray,mats.mask_skin,mats.new_masked_gray); // Get the new masked image
 
   // Detect hand
-  if (!(frame%(FRAMERATE))) {
-    detectFingerTip(video, flow, model, mats, context);
-  }
+  detectFingerTip(video, flow, model, mats, context);
 
   // Apply optical flow
   cv.calcOpticalFlowPyrLK(mats.old_masked_gray, mats.new_masked_gray,
