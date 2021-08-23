@@ -3,7 +3,7 @@ import cv2
 
 cap = cv2.VideoCapture(0)
 cv2.namedWindow('frame')
-backSub = cv2.createBackgroundSubtractorKNN()
+backSub = cv2.createBackgroundSubtractorMOG2()
 
 while True:
   ret, frame = cap.read()

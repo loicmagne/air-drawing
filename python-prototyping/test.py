@@ -38,7 +38,8 @@ while True:
                                                 None, maxLevel=1,
                                                 criteria=(cv2.TERM_CRITERIA_EPS | cv2.TERM_CRITERIA_COUNT, 15, 0.08))
 
-  cv2.circle(mask, (new_pts.ravel()[0] ,new_pts.ravel()[1]), 2, (0,255,0), 2)
+
+  cv2.circle(mask, (int(new_pts.ravel()[0]) ,int(new_pts.ravel()[1])), 2, (0,255,0), 2)
   combined = cv2.addWeighted(frame2, 0.7, mask, 0.3, 0.1)
 
   cv2.imshow('frame', cv2.flip(combined, 1))
