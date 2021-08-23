@@ -41,6 +41,14 @@ function gesture() {
     return 0;
 }
 
+function download_points(pt_list) {
+    const a = document.createElement("a");
+    const file = new Blob([JSON.stringify(pt_list, null, 2)], {type: "text/plain"});
+    a.href = URL.createObjectURL(file);
+    a.download = "data.txt";
+    a.click();
+}
+
 class Point {
     constructor(x,y) {
         this.x = x;
@@ -53,6 +61,7 @@ class Point {
 }
 
 function init() {
+    const download = document.querySelector('#download')
     const video = document.querySelector('video');
     const canvas = document.querySelector('canvas');
     const context = canvas.getContext('2d');
@@ -68,6 +77,7 @@ function init() {
     erase_icon.src = 'assets/erase.png';
 
     let pt_list = []
+    download.onclick = () => download_points(pt_list);
 
     async function process() {
         context.save();

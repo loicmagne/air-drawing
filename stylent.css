@@ -23,3 +23,8 @@ h1 {
     margin: 5%;
     margin-bottom: 3%;
 }
+
+#download {
+    display: block;
+    margin: 2%;
+}
