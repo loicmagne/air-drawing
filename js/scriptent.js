@@ -61,7 +61,9 @@ class Point {
 }
 
 function init() {
-    const download = document.querySelector('#download')
+    const download_button = document.querySelector('#download_button')
+    const clear_button = document.querySelector('#clear_button')
+    const dl_button = document.querySelector('#dl_button')
     const video = document.querySelector('video');
     const canvas = document.querySelector('canvas');
     const context = canvas.getContext('2d');
@@ -78,7 +80,9 @@ function init() {
 
     let stroke_list = new StrokeList();
     let previous_pt = null;
-    download.onclick = () => download_points(stroke_list);
+    download_button.onclick = () => download_points(stroke_list);
+    clear_button.onclick = () => stroke_list.clear();
+    dl_button.onclick = () => stroke_list.clear();
 
     async function process() {
         context.save();

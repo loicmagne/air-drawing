@@ -7,6 +7,10 @@ class StrokeList {
         this.stroke_list.at(-1).push(pt)
     }
 
+    clear () {
+        this.stroke_list = [[]];
+    }
+
     erase (erase_pos,radius) {
         let old_stroke_list = this.stroke_list.slice()
         this.stroke_list = [[]]

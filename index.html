@@ -15,11 +15,29 @@
 </head>
 
 <body>
-  <div class="container">
-    <h1>air-drawing</h1>
+  <div id="main">
+    <h1>air-drawing 👆</h1>
     <video class="input_video"></video>
-    <canvas class="output_canvas" width="1280px" height="720px"></canvas>
-    <input id="download" type="button" value="Download Point List">
+
+    <div id="draw_area">
+      <canvas class="output_canvas" width="1280px" height="720px"></canvas>
+      <div id="side"> 
+        <button id="clear_button" class="side_button" type="button"> Clear Board </button>
+        <button id="DL_button" class="side_button" type="button"> Apply Deep Learning Model</button>
+
+      </div>
+    </div>
+    <input id="download_button" type="button" value="Download Point List">
+
+    <h2>Instructions</h2>
+    <ul>
+      <li>The code is optimized to run on most machines, the bottleneck may be your webcam.
+          If your webcam is of low quality, you can try to blast light off your face, this will trigger your webcam sensors faster,
+          and possibly increase shutter speed and framerate. </li>
+      <li>The hand detection will work poorly if part of your hand if outside of the frame.</li>
+      <li>When drawing, try to keep your hand in this position 👆.
+          Lowering your index finger is natural but it hinders the detection of the fingertip</li>
+    </ul> 
   </div>
 </body>
 </html>
