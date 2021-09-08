@@ -1,8 +1,10 @@
 import pandas as pd
 import numpy as np
 import cv2
+from os import listdir
 
-df = pd.read_csv('data/raw_labeled/hat.csv',index_col=0)
+
+df = pd.read_csv('data/raw_labeled/reveil.csv',index_col=0)
 good_points = df.loc[df['label'] == True][['x','y']]
 pts = good_points.to_numpy().astype(int)
 

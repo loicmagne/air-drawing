@@ -3,7 +3,7 @@ import numpy as np
 import cv2
 
 
-df = pd.read_csv('data/unlabeled_csv/wheel.csv',index_col=0)
+df = pd.read_csv('data/unlabeled_csv/thinking.csv',index_col=0)
 pts = df.to_numpy().astype(int)
 
 black_img = np.zeros((720,1280), dtype=np.uint8)

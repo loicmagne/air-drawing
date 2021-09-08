@@ -19,7 +19,9 @@ for f in listdir(raw_folder):
     df["ax"] = 0.
     df["ay"] = 0.
     df["a"] = 0.
-    df["ttf"] = 0.
+    df["dist_left"] = 0.
+    df["dist_right"] = 0.
+    df["dist"] = 0.
     n = df.shape[0]
     
     # add speed
@@ -40,14 +42,28 @@ for f in listdir(raw_folder):
         df.loc[k,'ay'] = ay
         df.loc[k,'a'] = a
 
-    # add time to failure
-    ttf = 0.
+    # distance to swap starting from the right side
+    dist_right = 0.
     for k in range(1,n):
-        ttf += 1.
+        dist_right += 1.
         current = n-k-1
         previous = n-k
         if df.loc[current,'label'] != df.loc[previous,'label']:
-            ttf = 0.
-        df.loc[current,'ttf'] = ttf
+            dist_right = 0.
+        df.loc[current,'dist_right'] = dist_right
+
+    # distance to swap starting from the left side
+    dist_left = 0.
+    for k in range(1,n):
+        dist_left += 1.
+        current = k
+        previous = k-1
+        if df.loc[current,'label'] != df.loc[previous,'label']:
+            dist_left = 0.
+        df.loc[current,'dist_left'] = dist_left
     
+    # min distance to a swap
+    for k in range(1,n):
+        df.loc[k,'dist'] = min(df.loc[k,'dist_left'],df.loc[k,'dist_right'])
+
     df.to_csv(output_folder+f)

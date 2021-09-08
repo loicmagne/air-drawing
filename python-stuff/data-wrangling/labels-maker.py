@@ -3,14 +3,14 @@ import numpy as np
 import cv2
 
 
-data_file = 'wheel.csv'
+data_file = 'thinking.csv'
 
 """
 labels must be a list of segments where the time serie class is true 
 (i.e. the list of segments where the drawer has "hands down")
 """
 
-labels = [(97,210),(255,394),(426,457),(486,525),(563,594),(630,673)]
+labels = [(29,96),(122,145),(162,185),(209,220),(244,261),(339,454)]
 
 df = pd.read_csv('data/unlabeled_csv/'+data_file,index_col=0)
 df["label"] = False

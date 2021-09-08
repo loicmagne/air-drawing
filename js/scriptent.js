@@ -41,9 +41,9 @@ function gesture() {
     return 0;
 }
 
-function download_points(pt_list) {
+function download_points(stroke_list) {
     const a = document.createElement("a");
-    const file = new Blob([JSON.stringify(pt_list, null, 2)], {type: "text/plain"});
+    const file = stroke_list.download();
     a.href = URL.createObjectURL(file);
     a.download = "data.txt";
     a.click();
@@ -76,8 +76,9 @@ function init() {
     draw_icon.src = 'assets/draw.png';
     erase_icon.src = 'assets/erase.png';
 
-    let pt_list = []
-    download.onclick = () => download_points(pt_list);
+    let stroke_list = new StrokeList();
+    let previous_pt = null;
+    download.onclick = () => download_points(stroke_list);
 
     async function process() {
         context.save();
@@ -99,8 +100,14 @@ function init() {
             context.drawImage(draw_icon,width-166,height-100);
             // register point
             index_pos = finger_state.landmarks[fingers.index1];
-            pt_list.push(new Point(index_pos.x*width,index_pos.y*height));
+            new_pt = new Point(index_pos.x*width,index_pos.y*height);
+            stroke_list.add_pt(new_pt);
+            previous_pt = new_pt;
         } else {
+            if (previous_pt !== null) {
+                stroke_list.new_stroke();
+                previous_pt = null;
+            }
             context.globalAlpha = 0.2;
             context.drawImage(draw_icon,width-166,height-100);
         }
@@ -114,7 +121,7 @@ function init() {
             mdl = finger_state.landmarks[fingers.middle1];
             erase_pos = new Point(width*(idx.x+mdl.x)/2.,height*(idx.y+mdl.y)/2.);
             // filter erased points
-            pt_list = pt_list.filter(pt => Point.distance(erase_pos,pt) > erase_radius);
+            stroke_list.erase(erase_pos,erase_radius);
             // draw eraser
             context.lineWidth = 5;
             context.strokeStyle = 'salmon';
@@ -125,19 +132,10 @@ function init() {
             context.globalAlpha = 0.2;
             context.drawImage(erase_icon,width-166,height-200);
         }
-
         context.restore();
+
         context.save();
-
-        // draw points
-        context.fillStyle = 'magenta';
-        context.beginPath()
-        for (const pt of pt_list) {
-            context.moveTo(pt.x, pt.y)
-            context.arc(pt.x, pt.y, 4, 0, 2*Math.PI);
-        }
-        context.fill()
-
+        stroke_list.draw(context);
         context.restore();
     }
 
