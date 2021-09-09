@@ -7,7 +7,7 @@ output_folder = "data/processed_labeled/"
 
 # We intentionnaly drop some points to have a smoother drawing
 # interval define the step between each kept points
-interval = 3
+interval = 1
 
 for f in listdir(raw_folder):
     df_raw = pd.read_csv(raw_folder+f,index_col=0)
@@ -26,8 +26,8 @@ for f in listdir(raw_folder):
     
     # add speed
     for k in range(1,n):
-        vx = df.loc[k-1,'x'] - df.loc[k,'x']
-        vy = df.loc[k-1,'y'] - df.loc[k,'y']
+        vx = df.loc[k,'x'] - df.loc[k-1,'x']
+        vy = df.loc[k,'y'] - df.loc[k-1,'y']
         v = np.sqrt(vx*vx + vy*vy)
         df.loc[k,'vx'] = vx
         df.loc[k,'vy'] = vy
@@ -35,8 +35,8 @@ for f in listdir(raw_folder):
 
     # add acceleration
     for k in range(1,n):
-        ax = df.loc[k-1,'vx'] - df.loc[k,'vx']
-        ay = df.loc[k-1,'vy'] - df.loc[k,'vy']
+        ax = df.loc[k,'vx'] - df.loc[k-1,'vx']
+        ay = df.loc[k,'vy'] - df.loc[k-1,'vy']
         a = np.sqrt(ax*ax + ay*ay)
         df.loc[k,'ax'] = ax
         df.loc[k,'ay'] = ay

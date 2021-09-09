@@ -82,7 +82,7 @@ function init() {
     let previous_pt = null;
     download_button.onclick = () => download_points(stroke_list);
     clear_button.onclick = () => stroke_list.clear();
-    dl_button.onclick = () => stroke_list.clear();
+    dl_button.onclick = () => stroke_list.predict();
 
     async function process() {
         context.save();
