@@ -4,6 +4,8 @@ This tool uses Deep Learning to help you draw and write with your hand and webca
 
 **Try it online : [loicmagne.github.io/air-drawing](https://loicmagne.github.io/air-drawing/)**
 
+![](assets/gif.gif)
+
 ## Technical Details
 
 - This pipeline is made up of two steps: detecting the hand, and predicting the drawing. Both steps are done using Deep Learning.
