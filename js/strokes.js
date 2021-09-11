@@ -70,7 +70,7 @@ class StrokeList {
         data = data.map(x => {return [x.x,x.y];})
         data = transformData(data);
 
-        const session = await ort.InferenceSession.create('models/lstm_X_91_47.onnx');
+        const session = await ort.InferenceSession.create('models/lstm_1_84_63.onnx');
         const tensor = new ort.Tensor('float32',data.flat(),[data.length,6]);
         const feed = {'input': tensor};
         const result = await session.run(feed);
