@@ -18,5 +18,3 @@ This tool uses Deep Learning to help you draw and write with your hand and webca
 Overall the pipeline still struggles and needs some improvement. Ideas of amelioration include :
 - Having a bigger dataset, with more diverse user data.
 - Process and smooth the finger signal, to be less dependent on camera quality, and to improve model generalization.
-
-**Contact:** loic.magne@outlook.com
