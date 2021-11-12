@@ -1,6 +1,6 @@
 # air-drawing 👆
 
-This tool uses Deep Learning to help you draw and write with your hand and webcam. A Deep Learning model is used to try to predict whether you want to have 'pencil up' or 'pencil down'.
+This tool uses Deep Learning to help you draw and write with your hand and webcam. A Deep Learning model is used to try to predict the user intent: whether you want to have stroke ('pencil down') or just move your hand ('pencil up'). Watch the gif until the end to see how it works.
 
 **Try it online : [loicmagne.github.io/air-drawing](https://loicmagne.github.io/air-drawing/)**
 
@@ -18,5 +18,3 @@ This tool uses Deep Learning to help you draw and write with your hand and webca
 Overall the pipeline still struggles and needs some improvement. Ideas of amelioration include :
 - Having a bigger dataset, with more diverse user data.
 - Process and smooth the finger signal, to be less dependent on camera quality, and to improve model generalization.
-
-**Contact:** loic.magne@outlook.com
