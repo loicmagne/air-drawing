@@ -1,0 +1,6 @@
+# List of untracked files to ignore
+
+yolov5/yolov5_training/
+data/
+python-stuff/deep-learning/wandb/
+models/*.pt

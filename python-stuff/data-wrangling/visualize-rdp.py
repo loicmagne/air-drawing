@@ -5,9 +5,9 @@ from rdp import rdp
 from os import listdir
 
 
-df = pd.read_csv('data/raw_labeled/euler_sum.csv',index_col=0)
+df = pd.read_csv('data/raw_labeled/cat.csv',index_col=0)
 points = df[['x','y']].to_numpy().astype(int)
-points_rdp = rdp(points,1.)
+points_rdp = rdp(points,1.5)
 print(len(points))
 print(len(points_rdp))
 

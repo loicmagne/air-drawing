@@ -166,7 +166,8 @@ function init() {
         selfieMode: false,
         maxNumHands: 1,
         minDetectionConfidence: 0.5,
-        minTrackingConfidence: 0.5
+        minTrackingConfidence: 0.5,
+        modelComplexity: 1.
     });
     hands.onResults(processHands);
 
